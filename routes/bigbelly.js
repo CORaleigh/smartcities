@@ -2,10 +2,9 @@ var express = require('express');
 var router = express.Router();
 var request = require('request-promise');
 
-// const bigbellyhost = process.env.BIGBELLY_CLEAN_API;
-const bigbellyhost = 'https://api.bigbelly.com';
-// const bigbellytoken = process.env.X_TOKEN;
-const bigbellytoken = 'PxtFZzK5473bwBkxgTqT';
+const bigbellyhost = process.env.BIGBELLY_CLEAN_API;
+const bigbellytoken = process.env.BIGBELLY_TOKEN;
+const bigbellytoken = '';
 
 router.get('/', function (req, res, next) {
     res.send('hello bigbelly');
