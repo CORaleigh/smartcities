@@ -23,7 +23,7 @@ router.get('/', function (req, res, next) {
     event = event + 'T00:00:00';
 
     request(`${pedhost}/api/1.0/site`).then(body => {
-        console.log(body);
+        // console.log(body);
         siteIds = JSON.parse(body);
         siteIds.forEach((value) => {
             valueidArr.push(value);
@@ -34,7 +34,7 @@ router.get('/', function (req, res, next) {
             request(`${pedhost}/api/1.0/data/site/${val.id}/?begin=${event}&step=day`).then(body => {
                 valueids = JSON.parse(body);
                 valueids.forEach((x) => {
-                    console.log('x ', x);
+                   // console.log('x ', x);
                     x.siteid = val.id;
                     x.latitude = val.latitude;
                     x.longitude = val.longitude;

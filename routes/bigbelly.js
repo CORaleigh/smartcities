@@ -4,14 +4,13 @@ var request = require('request-promise');
 
 const bigbellyhost = process.env.BIGBELLY_CLEAN_API;
 const bigbellytoken = process.env.BIGBELLY_TOKEN;
-const bigbellytoken = '';
 
 router.get('/', function (req, res, next) {
     res.send('hello bigbelly');
 });
 
 router.get('/alerts', function (req, res, next) {
-    console.log('inside alerts');
+    // console.log('inside alerts');
     // valid routes from api docs are:
     // accounts, collectionSummary, assets, alerts, collectionReady
     // use ${req.params.route} if using :route instead of alerts in url
