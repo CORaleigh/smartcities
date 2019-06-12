@@ -41,9 +41,7 @@ router.get('/', function (req, res, next) {
                     x.latitude = val.latitude;
                     x.longitude = val.longitude;
                 });
-                
                 countsArr.push(valueids);
-                // countsArr.push(val.id);
                 if (itemsProcessed === countsArr.length) {
                     res.send(JSON.stringify(countsArr));
                 }
