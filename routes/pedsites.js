@@ -38,6 +38,7 @@ router.get('/', function (req, res, next) {
                     x.siteid = val.id;
                     x.latitude = val.latitude;
                     x.longitude = val.longitude;
+                    x.name = val.name;
                 });
                 countsArr.push(valueids);
                 if (itemsProcessed === countsArr.length) {
