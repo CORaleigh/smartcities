@@ -9,8 +9,6 @@ let siteIds;
 let event;
 const pedtoken = process.env.ECOVISIO_TOKEN;
 const pedhost = process.env.ECOVISIO_API;
-// const pedhost = "https://apieco.eco-counter-tools.com";
-let mergeObj = [];
 let valueids;
 let request = rp.defaults({
     headers: {
