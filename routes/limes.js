@@ -29,13 +29,6 @@ router.get('/', function (req, res, next) {
         console.log(body);
         let siteIds = JSON.parse(body);
         res.send(body);
-        // pass each site id to counter service to get counts per site 
-        // siteIds.forEach((value) => {
-        //     console.log("value id = ", value.id);
-        //     request(`${pedhost}/api/1.0/data/site/${value.id}/?begin=${event}&step=day`).then(cnts => {
-        //         console.log('cnts = ', cnts);
-        //     })
-        // });
     }).catch(err => {
         console.log(err);
     });
