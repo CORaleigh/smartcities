@@ -18,16 +18,13 @@ let request = rp.defaults({
     }
 });
 
-router.get('/', function (req, res, next) {
-    // countsArr.length = 0;
-
+router.get('/yesterday', function (req, res, next) {
     event = new Date();
     event.setDate(event.getDate() - 1);
     event = event.toISOString().slice(0, 10);
     event = event + 'T00:00:00';
 
     request(`${pedhost}/api/1.0/site`).then(body => {
-        // console.log(body);
         siteIds = JSON.parse(body);
         siteIds.forEach((value) => {
             valueidArr.push(value);
@@ -39,14 +36,148 @@ router.get('/', function (req, res, next) {
                 valueids = JSON.parse(body);
 
                 valueids.forEach((x) => {
-                    // console.log('x ', x);
                     x.siteid = val.id;
                     x.latitude = val.latitude;
                     x.longitude = val.longitude;
                     x.name = val.name;
                 });
-                // console.log('itemsProcessed = ', itemsProcessed, ' countsArr.length =', countsArr.length);
                 countsArr.push(valueids);
+                if (itemsProcessed === countsArr.length) {
+                    res.send(JSON.stringify(countsArr));
+                    countsArr.length = 0;
+                    valueidArr.length = 0;
+                    itemsProcessed = 0;
+                }
+            }).catch(err => {
+                console.log('the error is ', err);
+            })
+        });
+    }).catch(err => {
+        console.log(err);
+    });
+});
+
+router.get('/thisweek', function (req, res, next) {
+
+    function getMonday(d) {
+        d = new Date(d);
+        var day = d.getDay(),
+            diff = d.getDate() - day + (day == 0 ? -6 : 1); // adjust when day is sunday
+        return new Date(d.setDate(diff));
+    }
+
+    x = getMonday(new Date());
+    x = x.toISOString().slice(0, 10);
+    event = x + 'T00:00:00';
+
+    request(`${pedhost}/api/1.0/site`).then(body => {
+        siteIds = JSON.parse(body);
+        siteIds.forEach((value) => {
+            valueidArr.push(value);
+        });
+    }).finally(() => {
+        valueidArr.forEach((val) => {
+            itemsProcessed++;
+            request(`${pedhost}/api/1.0/data/site/${val.id}/?begin=${event}&step=week`).then(body => {
+                valueids = JSON.parse(body);
+
+                valueids.forEach((x) => {
+                    // if (x.status === 0) {
+                    x.siteid = val.id;
+                    x.latitude = val.latitude;
+                    x.longitude = val.longitude;
+                    x.name = val.name;
+                    // }
+                });
+                countsArr.push(valueids);
+                if (itemsProcessed === countsArr.length) {
+                    res.send(JSON.stringify(countsArr));
+                    countsArr.length = 0;
+                    valueidArr.length = 0;
+                    itemsProcessed = 0;
+                }
+            }).catch(err => {
+                console.log('the error is ', err);
+            })
+        });
+    }).catch(err => {
+        console.log(err);
+    });
+});
+
+router.get('/thismonth', function (req, res, next) {
+
+    date = new Date();
+    var firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+    firstDayOfMonth = firstDayOfMonth.toISOString().slice(0, 10);
+    event = firstDayOfMonth + 'T00:00:00';
+
+    request(`${pedhost}/api/1.0/site`).then(body => {
+        siteIds = JSON.parse(body);
+        siteIds.forEach((value) => {
+            valueidArr.push(value);
+        });
+    }).finally(() => {
+        valueidArr.forEach((val) => {
+            itemsProcessed++;
+            request(`${pedhost}/api/1.0/data/site/${val.id}/?begin=${event}&step=month`).then(body => {
+                valueids = JSON.parse(body);
+
+                valueids.forEach((x) => {
+                    if (x.status === 0) {
+                        x.siteid = val.id;
+                        x.latitude = val.latitude;
+                        x.longitude = val.longitude;
+                        x.name = val.name;
+                    }
+                });
+                countsArr.push(valueids);
+                if (itemsProcessed === countsArr.length) {
+                    res.send(JSON.stringify(countsArr));
+                    countsArr.length = 0;
+                    valueidArr.length = 0;
+                    itemsProcessed = 0;
+                }
+            }).catch(err => {
+                console.log('the error is ', err);
+            })
+        });
+    }).catch(err => {
+        console.log(err);
+    });
+});
+
+router.get('/thisyear', function (req, res, next) {
+    event = new Date();
+    event.setDate(event.getDate());
+    thisyear = event.getFullYear();
+    event = event.toISOString().slice(0, 10);
+    beginningOfYear = thisyear + '-01-01T00:00:00';
+    event = beginningOfYear;
+
+    request(`${pedhost}/api/1.0/site`).then(body => {
+        siteIds = JSON.parse(body);
+        siteIds.forEach((value) => {
+            valueidArr.push(value);
+        });
+    }).finally(() => {
+        valueidArr.forEach((val) => {
+            itemsProcessed++;
+            request(`${pedhost}/api/1.0/data/site/${val.id}/?begin=${event}&step=year`).then(body => {
+                valueids = JSON.parse(body);
+                valueids.forEach((x) => {
+                    if (x.status === 0) {
+                        x.siteid = val.id;
+                        x.latitude = val.latitude;
+                        x.longitude = val.longitude;
+                        x.name = val.name;
+                    } else {
+                        valueids.splice(x.lenth);
+                    }
+                });
+
+                countsArr.push(valueids);
+
                 if (itemsProcessed === countsArr.length) {
                     res.send(JSON.stringify(countsArr));
                     countsArr.length = 0;
