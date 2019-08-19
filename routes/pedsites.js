@@ -7,8 +7,7 @@ let valueidArr = [];
 let itemsProcessed = 0;
 let siteIds;
 let event;
-// const pedtoken = process.env.ECOVISIO_TOKEN;
-const pedtoken = 'b677de8fb7e673a0b6d194d4f4b8af63';
+const pedtoken = process.env.ECOVISIO_TOKEN;
 // const pedhost = process.env.ECOVISIO_API;
 const pedhost = 'https://apieco.eco-counter-tools.com';
 let valueids;
@@ -36,11 +35,18 @@ router.get('/yesterday', function (req, res, next) {
                 valueids = JSON.parse(body);
 
                 valueids.forEach((x) => {
-                    x.siteid = val.id;
-                    x.latitude = val.latitude;
-                    x.longitude = val.longitude;
-                    x.name = val.name;
+                    if (x.status === 0) {
+                        x.siteid = val.id;
+                        x.latitude = val.latitude;
+                        x.longitude = val.longitude;
+                        x.name = val.name;
+                    } else {
+                        // if status is not 0 remove the item
+                        valueids.splice(x.length);
+                    }
+
                 });
+
                 countsArr.push(valueids);
                 if (itemsProcessed === countsArr.length) {
                     res.send(JSON.stringify(countsArr));
@@ -82,13 +88,26 @@ router.get('/thisweek', function (req, res, next) {
                 valueids = JSON.parse(body);
 
                 valueids.forEach((x) => {
-                    // if (x.status === 0) {
-                    x.siteid = val.id;
-                    x.latitude = val.latitude;
-                    x.longitude = val.longitude;
-                    x.name = val.name;
-                    // }
+                    if (x.status === 0) {
+                        x.siteid = val.id;
+                        x.latitude = val.latitude;
+                        x.longitude = val.longitude;
+                        x.name = val.name;
+                        x.weekcounts = x.counts;
+                        delete x.counts;
+                    } else {
+                        // if status is not 0 remove the item
+                        valueids.splice(x.length);
+                    }
                 });
+
+                // replace counts with weekcounts
+                var i;
+                for (i = 0; i < countsArr.length; i++) {
+                    countsArr[i].weekcounts = countsArr[i]['counts'];
+                    delete countsArr[i].counts;
+                }
+
                 countsArr.push(valueids);
                 if (itemsProcessed === countsArr.length) {
                     res.send(JSON.stringify(countsArr));
@@ -129,8 +148,19 @@ router.get('/thismonth', function (req, res, next) {
                         x.latitude = val.latitude;
                         x.longitude = val.longitude;
                         x.name = val.name;
+                        x.monthcounts = x.counts;
+                        delete x.counts;
+                    } else {
+                        // if status is not 0 remove the item
+                        valueids.splice(x.length);
                     }
                 });
+                // replace counts with weekcounts
+                var i;
+                for (i = 0; i < countsArr.length; i++) {
+                    countsArr[i].monthcounts = countsArr[i]['counts'];
+                    delete countsArr[i].counts;
+                }
                 countsArr.push(valueids);
                 if (itemsProcessed === countsArr.length) {
                     res.send(JSON.stringify(countsArr));
@@ -171,14 +201,24 @@ router.get('/thisyear', function (req, res, next) {
                         x.latitude = val.latitude;
                         x.longitude = val.longitude;
                         x.name = val.name;
+                        x.yearcounts = x.counts;
+                        delete x.counts;
                     } else {
-                        valueids.splice(x.lenth);
+                        // if status is not 0 remove the item
+                        valueids.splice(x.length);
                     }
                 });
 
                 countsArr.push(valueids);
-
                 if (itemsProcessed === countsArr.length) {
+
+                    // countsArr = JSON.parse(countsArr);
+                    // // delete counts since we have already added yearcounts
+                    // var i;                    
+                    // for (i = 0; i < countsArr.length; i++) {
+                    //     console.log('counts is ', countsArr[i]);
+                    //     delete countsArr.counts;
+                    // }
                     res.send(JSON.stringify(countsArr));
                     countsArr.length = 0;
                     valueidArr.length = 0;
