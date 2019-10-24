@@ -11,9 +11,7 @@ let sites = new Object();
 let siteNameArr = [];
 let goodName;
 // const pedtoken = process.env.ECOVISIO_TOKEN;
-const pedtoken = '16cb9916ce464a981da6f79ec64575d';
 // const pedhost = process.env.ECOVISIO_API;
-const pedhost = 'https://apieco.eco-counter-tools.com';
 let valueids;
 let request = rp.defaults({
 	headers: {
@@ -32,7 +30,6 @@ router.get('/yesterday', function(req, res, next) {
 			siteIds = JSON.parse(body);
 			siteIds.forEach(value => {
 				valueidArr.push({ name: value.name, id: value.id });
-				// get the site name and then spread with valueidArr
 				value.channels.forEach(channel => {
 					channel.sitename = value.name;
 					valueidArr.push(channel);
