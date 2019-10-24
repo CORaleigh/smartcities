@@ -10,8 +10,8 @@ let event;
 let sites = new Object();
 let siteNameArr = [];
 let goodName;
-// const pedtoken = process.env.ECOVISIO_TOKEN;
-// const pedhost = process.env.ECOVISIO_API;
+const pedtoken = process.env.ECOVISIO_TOKEN;
+const pedhost = process.env.ECOVISIO_API;
 let valueids;
 let request = rp.defaults({
 	headers: {
@@ -51,7 +51,8 @@ router.get('/yesterday', function(req, res, next) {
 							x.latitude = val.latitude;
 							x.longitude = val.longitude;
 							x.interval = 'day';
-							x.name = val.name;
+							x.description = val.name;
+							x.source = 'Eco-Visio Pedestrian Counter';
 							x.countType =
 								val.userType === 1
 									? 'pedestrian'
@@ -77,10 +78,10 @@ router.get('/yesterday', function(req, res, next) {
 						valueids.forEach(fin => {
 							// console.log('fin', fin.countType);
 							if (fin.countType === 'unknown') {
-								goodName = fin.name;
+								goodName = fin.description;
 								valueids.splice(fin.length);
 							} else {
-								fin.name = goodName;
+								fin.description = goodName;
 							}
 							// fin.countType === 'unknown' ? splice(fin.length) ?
 						});
