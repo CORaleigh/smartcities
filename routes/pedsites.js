@@ -8,7 +8,7 @@ let itemsProcessed = 0;
 let siteIds;
 let event;
 let sites = new Object();
-let siteNameArr = [];
+let siteNameArr = new Array();
 let goodName;
 const pedtoken = process.env.ECOVISIO_TOKEN;
 const pedhost = process.env.ECOVISIO_API;
@@ -33,6 +33,7 @@ router.get('/yesterday', function(req, res, next) {
 				value.channels.forEach(channel => {
 					channel.sitename = value.name;
 					valueidArr.push(channel);
+					// console.log('valueidArr', valueidArr);
 					// valueidArr = {...valueidArr, ...channel};
 				});
 			});
@@ -51,7 +52,13 @@ router.get('/yesterday', function(req, res, next) {
 							x.latitude = val.latitude;
 							x.longitude = val.longitude;
 							x.interval = 'day';
-							x.description = val.name;
+							if (val.name.startsWith('Channel')) {
+								// console.log('startsWith Channel');
+								x.description = val.sitename;
+							} else {
+								valueids.splice(x.length);
+							}
+							// x.description = val.name;
 							x.source = 'Eco-Visio Pedestrian Counter';
 							x.countType =
 								val.userType === 1
@@ -72,27 +79,35 @@ router.get('/yesterday', function(req, res, next) {
 									? 'motocycle'
 									: val.userType === 9
 									? 'kayak'
-									: (x.countType = 'unknown');
+									: valueids.splice(x.length);
+									// : (x.countType = 'unknown');
 						});
 
-						valueids.forEach(fin => {
-							// console.log('fin', fin.countType);
-							if (fin.countType === 'unknown') {
-								goodName = fin.description;
-								valueids.splice(fin.length);
-							} else {
-								fin.description = goodName;
-							}
-							// fin.countType === 'unknown' ? splice(fin.length) ?
-						});
-
-						countsArr.push(valueids);
+						// valueids.forEach(fin => {
+						// 	if (!fin.name.startWith('Channel')) {
+						// 		valueids.splice(fin.length);
+						// 	} else {
+						// 		fin.description = fin.name;
+						// 	}
+						// 	// console.log('fin', fin.countType);
+						// 	// if (fin.countType === 'unknown') {
+						// 	// 	goodName = fin.description;
+						// 	// 	valueids.splice(fin.length);
+						// 	// } else {
+						// 	// 	fin.description = goodName;
+						// 	// }
+						// 	// fin.countType === 'unknown' ? splice(fin.length) ?
+						// });
+						
+							countsArr.push(valueids);
+						
 
 						if (itemsProcessed === countsArr.length) {
 							res.send(JSON.stringify(countsArr));
 							countsArr.length = 0;
 							valueidArr.length = 0;
 							itemsProcessed = 0;
+							siteNameArr.length = 0;
 						}
 					})
 					.catch(err => {
